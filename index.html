@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI-Powered Nollywood Movie Recommendation System — Discover Nigerian cinema with genre filters, content similarity, and movie posters.">
+<title>Nollywood AI Movie Recommender</title>
+
+<!-- Modern Typography & Icons -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    :root {
+        --bg-dark: #0b0f19;
+        --bg-card: rgba(22, 31, 54, 0.7);
+        --bg-card-hover: rgba(30, 42, 74, 0.95);
+        --accent-orange: #ff4e50;
+        --accent-yellow: #f9d423;
+        --accent-purple: #8a2be2;
+        --accent-teal: #00f2fe;
+        --text-bright: #ffffff;
+        --text-muted: #94a3b8;
+        --border-glass: rgba(255, 255, 255, 0.08);
+        --shadow-glow: 0 10px 30px rgba(255, 78, 80, 0.2);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+        background-color: var(--bg-dark);
+        background-image: 
+            radial-gradient(circle at 15% 15%, rgba(255, 78, 80, 0.12) 0%, transparent 40%),
+            radial-gradient(circle at 85% 85%, rgba(138, 43, 226, 0.12) 0%, transparent 40%);
+        min-height: 100vh;
+        color: #e2e8f0;
+        padding: 40px 20px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .brand-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(249, 212, 35, 0.1);
+        border: 1px solid rgba(249, 212, 35, 0.3);
+        color: var(--accent-yellow);
+        padding: 6px 16px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+    }
+
+    header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #ffffff 0%, var(--accent-yellow) 50%, var(--accent-orange) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 12px;
+        letter-spacing: -0.5px;
+    }
+
+    header p {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Tab Navigation */
+    .tab-navigation {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border-glass);
+        color: var(--text-muted);
+        padding: 10px 22px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .tab-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-bright);
+    }
+
+    .tab-btn.active {
+        background: linear-gradient(135deg, var(--accent-orange), #e63946);
+        color: var(--text-bright);
+        border-color: transparent;
+        box-shadow: 0 4px 15px rgba(255, 78, 80, 0.35);
+    }
+
+    /* Search Container */
+    .search-card {
+        background: rgba(22, 31, 54, 0.6);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--border-glass);
+        padding: 24px;
+        border-radius: 20px;
+        max-width: 800px;
+        margin: 0 auto 35px auto;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .search-controls {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .input-wrapper {
+        flex: 1;
+        min-width: 260px;
+        position: relative;
+    }
+
+    .input-wrapper i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #64748b;
+        font-size: 1.1rem;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 14px 18px 14px 48px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 1rem;
+        outline: none;
+        background: rgba(11, 15, 25, 0.8);
+        color: #fff;
+        transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+        border-color: var(--accent-orange);
+        box-shadow: 0 0 0 3px rgba(255, 78, 80, 0.15);
+    }
+
+    .select-dropdown {
+        padding: 14px 16px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.95rem;
+        outline: none;
+        background: rgba(11, 15, 25, 0.8);
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .btn-action {
+        padding: 14px 28px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange));
+        color: #0f172a;
+        font-weight: 800;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-glow);
+    }
+
+    /* Quick Pills */
+    .genre-pills {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+    }
+
+    .pill {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-glass);
+        color: var(--text-muted);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .pill:hover {
+        background: rgba(249, 212, 35, 0.15);
+        color: var(--accent-yellow);
+        border-color: rgba(249, 212, 35, 0.4);
+    }
+
+    /* Results Header & Grid */
+    #status-message {
+        text-align: center;
+        color: var(--text-muted);
+        margin-bottom: 25px;
+        font-size: 1.05rem;
+        font-weight: 500;
+    }
+
+    .movie-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+        gap: 24px;
+    }
+
+    /* Card Styling */
+    .card {
+        background: var(--bg-card);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border-glass);
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .card:hover {
+        transform: translateY(-6px);
+        background: var(--bg-card-hover);
+        border-color: rgba(255, 255, 255, 0.18);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-poster {
+        position: relative;
+        width: 100%;
+        height: 350px;
+        background: #111827;
+        overflow: hidden;
+    }
+
+    .card-poster img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+
+    .card:hover .card-poster img {
+        transform: scale(1.05);
+    }
+
+    .rating-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(249, 212, 35, 0.4);
+        color: var(--accent-yellow);
+        font-size: 0.82rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .similarity-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: rgba(138, 43, 226, 0.85);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #fff;
+        font-size: 0.78rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+    }
+
+    .card-body {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-bright);
+        margin-bottom: 6px;
+        line-height: 1.3;
+    }
+
+    .card-meta {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .card-genre {
+        background: rgba(255, 78, 80, 0.12);
+        color: var(--accent-orange);
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+
+    .card-desc {
+        font-size: 0.85rem;
+        color: #cbd5e1;
+        line-height: 1.5;
+        margin-bottom: 16px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex: 1;
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: auto;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-glass);
+    }
+
+    .btn-card {
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border-glass);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-bright);
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .btn-card:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-card.btn-similar {
+        background: rgba(138, 43, 226, 0.2);
+        border-color: rgba(138, 43, 226, 0.4);
+        color: #d8b4fe;
+    }
+
+    .btn-card.btn-similar:hover {
+        background: rgba(138, 43, 226, 0.4);
+        color: #fff;
+    }
+
+    .btn-card.btn-bookmark.active {
+        color: var(--accent-orange);
+        border-color: var(--accent-orange);
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(12px);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        padding: 20px;
+    }
+
+    .modal-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .modal-content {
+        background: #111827;
+        border: 1px solid var(--border-glass);
+        border-radius: 20px;
+        max-width: 750px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+        border: none;
+        color: #fff;
+        font-size: 1.2rem;
+        cursor: pointer;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-header {
+        display: flex;
+        gap: 24px;
+        padding: 24px;
+        background: rgba(255,255,255,0.02);
+        border-bottom: 1px solid var(--border-glass);
+        flex-wrap: wrap;
+    }
+
+    .modal-poster {
+        width: 180px;
+        height: 260px;
+        border-radius: 12px;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .modal-poster img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .modal-info {
+        flex: 1;
+        min-width: 240px;
+    }
+
+    .modal-title {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 8px;
+    }
+
+    .modal-detail-row {
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: #cbd5e1;
+    }
+
+    .modal-detail-row strong {
+        color: var(--text-muted);
+    }
+
+    .modal-body {
+        padding: 24px;
+    }
+
+    .modal-body h4 {
+        color: var(--accent-yellow);
+        margin-bottom: 8px;
+    }
+
+    .modal-body p {
+        color: #e2e8f0;
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+
+    footer {
+        text-align: center;
+        color: var(--text-muted);
+        margin-top: 60px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-glass);
+        font-size: 0.9rem;
+    }
+
+    footer span {
+        color: var(--accent-yellow);
+        font-weight: 700;
+    }
+
+    /* Skeleton Loader */
+    .skeleton-card {
+        background: var(--bg-card);
+        border-radius: 16px;
+        height: 480px;
+        animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 0.6; }
+        50% { opacity: 0.3; }
+        100% { opacity: 0.6; }
+    }
+
+    @media (max-width: 600px) {
+        header h1 { font-size: 2.2rem; }
+        .modal-header { flex-direction: column; align-items: center; text-align: center; }
+        .modal-poster { width: 140px; height: 200px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="brand-badge"><i class="fa-solid fa-film"></i> Nollywood Cinema AI</div>
+        <h1>Movie Recommender</h1>
+        <p>Explore over 7,000 Nigerian films with instant genre search & AI content similarity recommendations.</p>
+    </header>
+
+    <!-- Tab Navigation Modes -->
+    <div class="tab-navigation">
+        <button class="tab-btn active" onclick="switchMode('genre')">
+            <i class="fa-solid fa-masks-theater"></i> Genre Search
+        </button>
+        <button class="tab-btn" onclick="switchMode('similar')">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> More Like This
+        </button>
+        <button class="tab-btn" onclick="switchMode('search')">
+            <i class="fa-solid fa-magnifying-glass"></i> Multi-Search
+        </button>
+        <button class="tab-btn" onclick="switchMode('watchlist')">
+            <i class="fa-solid fa-bookmark"></i> Watchlist (<span id="watchlist-count">0</span>)
+        </button>
+    </div>
+
+    <!-- Interactive Search Box -->
+    <div class="search-card">
+        <div class="search-controls">
+            <div class="input-wrapper">
+                <i class="fa-solid fa-magnifying-glass" id="input-icon"></i>
+                <input type="text" id="main-input" class="search-input" placeholder="e.g. Comedy, Drama, Romance...">
+            </div>
+
+            <select id="field-select" class="select-dropdown" style="display: none;">
+                <option value="all">Search All Fields</option>
+                <option value="title">Title Only</option>
+                <option value="genre">Genre Only</option>
+                <option value="director">Director Only</option>
+                <option value="stars">Cast / Actor Only</option>
+            </select>
+
+            <select id="limit-select" class="select-dropdown">
+                <option value="10">10 Movies</option>
+                <option value="20" selected>20 Movies</option>
+                <option value="30">30 Movies</option>
+            </select>
+
+            <button id="search-btn" class="btn-action" onclick="handleCurrentSearch()">
+                <i class="fa-solid fa-arrow-right"></i> Search
+            </button>
+        </div>
+
+        <!-- Quick Genre Filter Pills -->
+        <div class="genre-pills" id="genre-pills-container">
+            <span class="pill" onclick="quickGenre('Comedy')">🎭 Comedy</span>
+            <span class="pill" onclick="quickGenre('Drama')">🎬 Drama</span>
+            <span class="pill" onclick="quickGenre('Romance')">❤️ Romance</span>
+            <span class="pill" onclick="quickGenre('Action')">⚡ Action</span>
+            <span class="pill" onclick="quickGenre('Thriller')">🔪 Thriller</span>
+            <span class="pill" onclick="quickGenre('Family')">👨‍👩‍👧 Family</span>
+            <span class="pill" onclick="loadFeatured()">⭐ Featured Top Rated</span>
+        </div>
+    </div>
+
+    <!-- Status Message -->
+    <div id="status-message">Showing recommendations below</div>
+
+    <!-- Movies Grid -->
+    <div class="movie-grid" id="results-grid"></div>
+
+    <footer>
+        <p>Built with FastAPI & pandas &mdash; Dataset of 7,300+ Nollywood films with TMDB poster enrichment.</p>
+        <p style="margin-top: 6px;">Created by <span>ALIYU</span></p>
+    </footer>
+</div>
+
+<!-- Movie Detail Modal -->
+<div class="modal-overlay" id="movie-modal" onclick="closeModalOnOverlay(event)">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <div class="modal-header">
+            <div class="modal-poster">
+                <img id="modal-img" src="" alt="Movie Poster">
+            </div>
+            <div class="modal-info">
+                <h2 class="modal-title" id="modal-title">Movie Title</h2>
+                <div class="modal-detail-row"><strong>Release Year:</strong> <span id="modal-year">-</span></div>
+                <div class="modal-detail-row"><strong>Rating:</strong> <span id="modal-rating">-</span></div>
+                <div class="modal-detail-row"><strong>Genre:</strong> <span id="modal-genre">-</span></div>
+                <div class="modal-detail-row"><strong>Director:</strong> <span id="modal-director">-</span></div>
+                <div class="modal-detail-row"><strong>Cast:</strong> <span id="modal-stars">-</span></div>
+            </div>
+        </div>
+        <div class="modal-body">
+            <h4>Synopsis</h4>
+            <p id="modal-desc">Movie plot overview...</p>
+            <div style="margin-top: 20px;">
+                <button class="btn-action" id="modal-similar-btn">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Find Movies Similar to This
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE_URL = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port === '8000' ? 'http://127.0.0.1:8000' : '';
+    let currentMode = 'genre'; // 'genre', 'similar', 'search', 'watchlist'
+    let currentMoviesList = [];
+
+    // Local Storage Watchlist Manager
+    function getWatchlist() {
+        return JSON.parse(localStorage.getItem('nollywood_watchlist') || '[]');
+    }
+
+    function toggleWatchlist(movie) {
+        let watchlist = getWatchlist();
+        const index = watchlist.findIndex(m => m.title === movie.title);
+        if (index > -1) {
+            watchlist.splice(index, 1);
+        } else {
+            watchlist.push(movie);
+        }
+        localStorage.setItem('nollywood_watchlist', JSON.stringify(watchlist));
+        updateWatchlistCount();
+        if (currentMode === 'watchlist') {
+            displayWatchlist();
+        } else {
+            renderGrid(currentMoviesList);
+        }
+    }
+
+    function updateWatchlistCount() {
+        document.getElementById('watchlist-count').textContent = getWatchlist().length;
+    }
+
+    // Tab Mode Switcher
+    function switchMode(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+        const input = document.getElementById('main-input');
+        const fieldSelect = document.getElementById('field-select');
+        const pills = document.getElementById('genre-pills-container');
+        const icon = document.getElementById('input-icon');
+
+        if (mode === 'genre') {
+            event.target.closest('.tab-btn').classList.add('active');
+            input.placeholder = "Enter genre (e.g. Comedy, Drama, Romance)...";
+            fieldSelect.style.display = "none";
+            pills.style.display = "flex";
+            icon.className = "fa-solid fa-masks-theater";
+        } else if (mode === 'similar') {
+            event.target.closest('.tab-btn').classList.add('active');
+            input.placeholder = "Enter exact or partial movie title (e.g. Daughters of Donald)...";
+            fieldSelect.style.display = "none";
+            pills.style.display = "none";
+            icon.className = "fa-solid fa-wand-magic-sparkles";
+        } else if (mode === 'search') {
+            event.target.closest('.tab-btn').classList.add('active');
+            input.placeholder = "Search titles, actors, directors, or keywords...";
+            fieldSelect.style.display = "block";
+            pills.style.display = "none";
+            icon.className = "fa-solid fa-magnifying-glass";
+        } else if (mode === 'watchlist') {
+            event.target.closest('.tab-btn').classList.add('active');
+            displayWatchlist();
+        }
+    }
+
+    // Helper functions
+    function quickGenre(genreName) {
+        document.getElementById('main-input').value = genreName;
+        switchMode('genre');
+        fetchRecommendations(genreName, document.getElementById('limit-select').value);
+    }
+
+    function handleCurrentSearch() {
+        const query = document.getElementById('main-input').value.trim();
+        const limit = document.getElementById('limit-select').value;
+
+        if (currentMode === 'genre') {
+            if (!query) return alert('Please enter a genre to search!');
+            fetchRecommendations(query, limit);
+        } else if (currentMode === 'similar') {
+            if (!query) return alert('Please enter a movie title!');
+            fetchSimilar(query, limit);
+        } else if (currentMode === 'search') {
+            if (!query) return alert('Please enter a search term!');
+            const field = document.getElementById('field-select').value;
+            fetchMultiSearch(query, field, limit);
+        }
+    }
+
+    // Listen for Enter Key
+    document.getElementById('main-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') handleCurrentSearch();
+    });
+
+    // API Fetch Methods
+    function showLoading() {
+        const grid = document.getElementById('results-grid');
+        grid.innerHTML = Array(6).fill('<div class="skeleton-card"></div>').join('');
+        document.getElementById('status-message').textContent = 'AI model is filtering and fetching recommendations...';
+    }
+
+    function fetchRecommendations(genre, limit) {
+        showLoading();
+        fetch(`${API_BASE_URL}/recommend?genre=${encodeURIComponent(genre)}&limit=${limit}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('status-message').textContent = `Found ${data.count} movie(s) for genre "${data.genre}"`;
+                renderGrid(data.results);
+            })
+            .catch(handleFetchError);
+    }
+
+    function fetchSimilar(title, limit) {
+        showLoading();
+        fetch(`${API_BASE_URL}/recommend/similar?title=${encodeURIComponent(title)}&limit=${limit}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Movie title not found in dataset.');
+                return res.json();
+            })
+            .then(data => {
+                document.getElementById('status-message').textContent = `Showing top AI similarity matches for "${data.target_movie}"`;
+                renderGrid(data.results);
+            })
+            .catch(handleFetchError);
+    }
+
+    function fetchMultiSearch(query, field, limit) {
+        showLoading();
+        fetch(`${API_BASE_URL}/search?query=${encodeURIComponent(query)}&field=${field}&limit=${limit}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('status-message').textContent = `Found ${data.count} result(s) matching "${query}" (${field})`;
+                renderGrid(data.results);
+            })
+            .catch(handleFetchError);
+    }
+
+    function loadFeatured() {
+        showLoading();
+        fetch(`${API_BASE_URL}/featured?limit=12`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('status-message').textContent = `Showing Featured Top-Rated Nollywood Films`;
+                renderGrid(data.results);
+            })
+            .catch(handleFetchError);
+    }
+
+    function displayWatchlist() {
+        const watchlist = getWatchlist();
+        document.getElementById('status-message').textContent = `Your Saved Watchlist (${watchlist.length} movies)`;
+        renderGrid(watchlist);
+    }
+
+    function handleFetchError(err) {
+        document.getElementById('status-message').textContent = 'Error loading results. Is the FastAPI server running at http://127.0.0.1:8000?';
+        console.error(err);
+    }
+
+    // Dynamic Gradient SVG Placeholder Generator
+    function buildPlaceholder(title, genre, director, year) {
+        const safeTitle = title || 'Nollywood Film';
+        const safeGenre = genre || 'Drama';
+        const safeYear = year ? `(${parseInt(year)})` : '';
+        
+        let hash = 0;
+        for (let i = 0; i < safeTitle.length; i++) {
+            hash = safeTitle.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        
+        const hue1 = Math.abs(hash) % 360;
+        const hue2 = (hue1 + 50) % 360;
+        
+        const svg = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="500" height="750" viewBox="0 0 500 750">
+                <defs>
+                    <linearGradient id="g-${Math.abs(hash)}" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="hsl(${hue1}, 75%, 25%)" />
+                        <stop offset="100%" stop-color="hsl(${hue2}, 80%, 12%)" />
+                    </linearGradient>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#g-${Math.abs(hash)})"/>
+                <circle cx="250" cy="250" r="120" fill="rgba(255,255,255,0.03)" />
+                <rect x="200" y="40" width="100" height="24" rx="12" fill="rgba(249, 212, 35, 0.2)" stroke="rgba(249, 212, 35, 0.6)"/>
+                <text x="50%" y="56" font-family="sans-serif" font-weight="bold" font-size="11" fill="#f9d423" text-anchor="middle" letter-spacing="2">NOLLYWOOD</text>
+                <text x="50%" y="360" font-family="sans-serif" font-weight="800" font-size="32" fill="#ffffff" text-anchor="middle">${safeTitle.substring(0, 22)}</text>
+                <text x="50%" y="600" font-family="sans-serif" font-weight="bold" font-size="16" fill="#f9d423" text-anchor="middle" letter-spacing="2">${safeGenre.toUpperCase()}</text>
+                <text x="50%" y="640" font-family="sans-serif" font-size="16" fill="#ffffff" text-anchor="middle">${safeYear}</text>
+            </svg>
+        `;
+        return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+    }
+
+    // Grid Renderer
+    function renderGrid(movies) {
+        currentMoviesList = movies;
+        const grid = document.getElementById('results-grid');
+        
+        if (!movies || movies.length === 0) {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted); font-size: 1.1rem;">No movies found. Try another search or genre!</div>`;
+            return;
+        }
+
+        const watchlist = getWatchlist();
+
+        grid.innerHTML = movies.map((movie, index) => {
+            const isBookmarked = watchlist.some(m => m.title === movie.title);
+            const placeholder = buildPlaceholder(movie.title, movie.genre, movie.director, movie.year);
+            const posterSrc = movie.poster_url && movie.poster_url.trim() !== '' ? movie.poster_url : placeholder;
+            const ratingDisplay = movie.rating ? `★ ${movie.rating}` : 'Unrated';
+            const similarityDisplay = movie.similarity_score ? `<div class="similarity-badge">Match ${(movie.similarity_score * 100).toFixed(0)}%</div>` : '';
+
+            return `
+                <div class="card">
+                    <div class="card-poster">
+                        <img src="${posterSrc}" alt="${movie.title}" onerror="this.onerror=null; this.src='${placeholder}';">
+                        <div class="rating-badge">${ratingDisplay}</div>
+                        ${similarityDisplay}
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">${movie.title}</h3>
+                        <div class="card-meta">
+                            <span>${movie.year ? parseInt(movie.year) : 'Year N/A'}</span> &bull; 
+                            <span class="card-genre">${movie.genre || 'Drama'}</span>
+                        </div>
+                        <p class="card-desc">${movie.show_desc || 'No description available for this film.'}</p>
+                        
+                        <div class="card-actions">
+                            <button class="btn-card btn-similar" onclick="fetchSimilar('${movie.title.replace(/'/g, "\\'")}', 10)">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Similar
+                            </button>
+                            <button class="btn-card btn-bookmark ${isBookmarked ? 'active' : ''}" onclick='toggleWatchlist(${JSON.stringify(movie).replace(/'/g, "&apos;")})'>
+                                <i class="fa-${isBookmarked ? 'solid' : 'regular'} fa-bookmark"></i>
+                            </button>
+                            <button class="btn-card" onclick='openModal(${JSON.stringify(movie).replace(/'/g, "&apos;")})'>
+                                <i class="fa-solid fa-circle-info"></i> Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Modal Logic
+    function openModal(movie) {
+        const placeholder = buildPlaceholder(movie.title, movie.genre, movie.director, movie.year);
+        document.getElementById('modal-img').src = movie.poster_url && movie.poster_url.trim() !== '' ? movie.poster_url : placeholder;
+        document.getElementById('modal-title').textContent = movie.title;
+        document.getElementById('modal-year').textContent = movie.year ? parseInt(movie.year) : 'Unknown';
+        document.getElementById('modal-rating').textContent = movie.rating ? `★ ${movie.rating} / 10` : 'Not Rated';
+        document.getElementById('modal-genre').textContent = movie.genre || 'Not specified';
+        document.getElementById('modal-director').textContent = movie.director || 'Unknown';
+        document.getElementById('modal-stars').textContent = movie.stars || 'Not listed';
+        document.getElementById('modal-desc').textContent = movie.show_desc || 'No description available for this film.';
+        
+        const simBtn = document.getElementById('modal-similar-btn');
+        simBtn.onclick = function() {
+            closeModal();
+            switchMode('similar');
+            document.getElementById('main-input').value = movie.title;
+            fetchSimilar(movie.title, 10);
+        };
+
+        document.getElementById('movie-modal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('movie-modal').classList.remove('active');
+    }
+
+    function closeModalOnOverlay(e) {
+        if (e.target.classList.contains('modal-overlay')) closeModal();
+    }
+
+    // Initial Load
+    updateWatchlistCount();
+    quickGenre('Comedy');
+</script>
+
+</body>
+</html>
