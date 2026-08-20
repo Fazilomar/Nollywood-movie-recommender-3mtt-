@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Nollywood Movie Recommender
 
 A content-based and genre recommendation system for Nollywood films, built end-to-end with a Python/pandas/scikit-learn data pipeline, a FastAPI backend, and a modern glassmorphism web frontend — complete with movie posters fetched dynamically from TMDB.
@@ -89,3 +90,7 @@ Open `index.html` in your browser.
 ---
 
 Built with FastAPI + pandas + scikit-learn — Nollywood data sourced from IMDb, posters sourced from TMDB.
+=======
+# Nollywood-movie-recommender-3mtt-
+A nollywood movie recommender 
+>>>>>>> 50868245665d856c4d669a6caed630ca44efea9a
