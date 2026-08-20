@@ -25,3 +25,4 @@ Thumbs.db
 
 # Vercel Build Output
 .vercel/
+"key.env" 
