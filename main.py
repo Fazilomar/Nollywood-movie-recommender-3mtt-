@@ -1,10 +1,16 @@
 import os
 import requests
 import pandas as pd
+# pyrefly: ignore [missing-import]
 import numpy as np
+# pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
+# pyrefly: ignore [missing-import]
 from fastapi import FastAPI, Query, BackgroundTasks, HTTPException
+# pyrefly: ignore [missing-import]
 from fastapi.middleware.cors import CORSMiddleware
+# pyrefly: ignore [missing-import]
+from fastapi.responses import FileResponse
 
 # Try importing sklearn with fallback safety
 try:
@@ -272,6 +278,27 @@ def fetch_posters_background(movies_to_enrich):
 # API Endpoints
 @app.get("/")
 def home():
+    index_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {
+        "name": "Nollywood Movie Recommender API",
+        "version": "2.0.0",
+        "total_movies": len(df),
+        "posters_cached": int((df["poster_url"] != "").sum()),
+        "sklearn_tfidf_active": SKLEARN_AVAILABLE,
+        "endpoints": {
+            "/recommend": "Recommend by genre",
+            "/recommend/similar": "Content-based recommendations for a target movie",
+            "/search": "Multi-field movie search across title, genre, director, stars",
+            "/featured": "Collection of top-rated & trending Nollywood movies"
+        }
+    }
+
+
+@app.get("/api/status")
+@app.get("/status")
+def status():
     return {
         "name": "Nollywood Movie Recommender API",
         "version": "2.0.0",

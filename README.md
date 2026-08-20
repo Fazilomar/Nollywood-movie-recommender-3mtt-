@@ -18,13 +18,14 @@ This project lets users explore over 7,300 Nigerian films with:
 
 ## Tech Stack
 
-| Layer | Tools |
+| Layer | Technologies & Tools |
 |---|---|
-| Recommendation Engine | Python, pandas, scikit-learn (TF-IDF & Cosine Similarity), NumPy |
-| Poster Enrichment | TMDB API, `requests`, `concurrent.futures` |
-| Backend / API | FastAPI, uvicorn |
-| Frontend | HTML5, Vanilla CSS3 (Glassmorphism & CSS Grid), JavaScript (ES6+), FontAwesome |
-| Data Source | Nollywood Movies dataset (IMDb-scraped, via Kaggle) |
+| **Data Processing & ML** | Python, pandas, NumPy, scikit-learn (`TfidfVectorizer`, Cosine Similarity) |
+| **Backend / API** | FastAPI, Uvicorn, python-dotenv |
+| **Poster Enrichment & APIs** | TMDB (The Movie Database) API, `requests`, `concurrent.futures` (`ThreadPoolExecutor`) |
+| **Frontend** | HTML5, Vanilla CSS3 (Glassmorphism, CSS Grid & Flexbox), Vanilla JavaScript (ES6+, Fetch API, LocalStorage), FontAwesome 6, Google Fonts (Plus Jakarta Sans) |
+| **Data Source** | Nollywood Movies Dataset (scraped from IMDb) |
+| **Deployment / Serverless** | Vercel (`vercel.json`), Python ASGI (`api/index.py`) |
 
 ---
 
@@ -32,14 +33,18 @@ This project lets users explore over 7,300 Nigerian films with:
 
 ```
 nollywood-recommender/
-├── movierecommender.ipynb    # Data cleaning, enrichment, and poster-fetching notebook
-├── movies_clean.csv          # Cleaned dataset with poster URLs
-├── main.py                   # FastAPI backend with TF-IDF similarity & search endpoints
-├── index.html                # Modern glassmorphism web frontend with Watchlist & Modals
+├── api/
+│   └── index.py              # Vercel serverless entry point
+├── enrich_rated_posters.py   # Multi-threaded TMDB poster pre-fetch script
 ├── evaluation.py             # Recommender evaluation and test suite
-├── enrich_rated_posters.py   # Multi-threaded poster pre-fetch script
-├── requirements.txt          # Dependencies (fastapi, pandas, scikit-learn, requests, uvicorn)
-└── README.md
+├── index.html                # Modern glassmorphism web frontend with Watchlist & Modals
+├── key.env                   # TMDB API key configuration
+├── main.py                   # FastAPI backend with TF-IDF similarity & search endpoints
+├── movierecommender.ipynb    # Data cleaning, EDA, and poster-fetching notebook
+├── movies_clean.csv          # Cleaned Nollywood movie dataset with poster URLs
+├── requirements.txt          # Python dependencies (fastapi, pandas, scikit-learn, etc.)
+├── vercel.json               # Vercel deployment configuration
+└── README.md                 # Project documentation
 ```
 
 ---

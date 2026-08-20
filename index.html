@@ -358,6 +358,7 @@
         margin-bottom: 16px;
         display: -webkit-box;
         -webkit-line-clamp: 3;
+        line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
         flex: 1;
@@ -666,7 +667,7 @@
 </div>
 
 <script>
-    const API_BASE_URL = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') && window.location.port === '8000' ? 'http://127.0.0.1:8000' : '';
+    const API_BASE_URL = window.location.protocol.startsWith('http') ? '' : 'http://127.0.0.1:8000';
     let currentMode = 'genre'; // 'genre', 'similar', 'search', 'watchlist'
     let currentMoviesList = [];
 
