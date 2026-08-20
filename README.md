@@ -1,5 +1,7 @@
 
 # Nollywood Movie Recommender
+https://nollywood-movie-recommender-3mtt.vercel.app/
+
 
 A content-based and genre recommendation system for Nollywood films, built end-to-end with a Python/pandas/scikit-learn data pipeline, a FastAPI backend, and a modern glassmorphism web frontend — complete with movie posters fetched dynamically from TMDB.
 
